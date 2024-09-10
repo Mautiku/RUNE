@@ -1,10 +1,4 @@
---3D GUI BY sussyyyyyyYYYYYY
-
-
-
-
-
-
+-- all 3d
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local head = character:WaitForChild("Head")
@@ -751,4 +745,257 @@ end
 
 -- Call the function to create the floating player list GUI
 createCurvedPlayerListGui()
+wait(0.4)
+-- Get the player's details
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local head = character:WaitForChild("Head")
+local humanoid = character:WaitForChild("Humanoid")
+local animator = humanoid:WaitForChild("Animator")
+
+-- Create the floating part for the main GUI (Animation ID display)
+local part = Instance.new("Part")
+part.Size = Vector3.new(10, 5, 0.1)
+part.Anchored = true
+part.CanCollide = false
+part.Transparency = 1
+part.Parent = workspace
+
+-- Create SurfaceGui for the front
+local surfaceGui = Instance.new("SurfaceGui")
+surfaceGui.Adornee = part
+surfaceGui.Face = Enum.NormalId.Front
+surfaceGui.CanvasSize = Vector2.new(600, 300)
+surfaceGui.Parent = part
+
+-- Create Frame for the GUI
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(1, 0, 1, 0)
+frame.BackgroundTransparency = 0.4
+frame.BackgroundColor3 = Color3.new(0, 0, 0)
+frame.BorderSizePixel = 2
+frame.Parent = surfaceGui
+
+-- Add rounded corners to the frame
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 20)
+corner.Parent = frame
+
+-- TextLabel for displaying the Animation ID
+local animationIdLabel = Instance.new("TextLabel")
+animationIdLabel.Size = UDim2.new(1, 0, 0.2, 0)
+animationIdLabel.Position = UDim2.new(0, 0, 0.4, 0)
+animationIdLabel.TextScaled = true
+animationIdLabel.BackgroundTransparency = 1
+animationIdLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+animationIdLabel.Font = Enum.Font.GothamBold
+animationIdLabel.Text = "Animation ID: None"
+animationIdLabel.Parent = frame
+
+-- Add rounded corners to the label
+local animationIdCorner = Instance.new("UICorner")
+animationIdCorner.CornerRadius = UDim.new(0, 20)
+animationIdCorner.Parent = animationIdLabel
+
+-- Function to update the Animation ID in real-time
+local function updateAnimationId(animTrack)
+    if animTrack and animTrack.Animation then
+        local animId = tostring(animTrack.Animation.AnimationId):match("%d+")
+        animationIdLabel.Text = "Animation ID: " .. animId
+    else
+        animationIdLabel.Text = "Animation ID: None"
+    end
+end
+
+-- Monitor animations being played by the humanoid
+animator.AnimationPlayed:Connect(function(animTrack)
+    updateAnimationId(animTrack)
+
+    -- Detect when the animation stops playing
+    animTrack.Stopped:Connect(function()
+        animationIdLabel.Text = "Animation ID: None"
+    end)
+end)
+
+-- Create the floating part for the new input GUI (right side)
+local inputPart = Instance.new("Part")
+inputPart.Size = Vector3.new(10, 5, 0.1)
+inputPart.Anchored = true
+inputPart.CanCollide = false
+inputPart.Transparency = 1
+inputPart.Parent = workspace
+
+-- Create SurfaceGui for the input GUI
+local surfaceGuiInput = Instance.new("SurfaceGui")
+surfaceGuiInput.Adornee = inputPart
+surfaceGuiInput.Face = Enum.NormalId.Front
+surfaceGuiInput.CanvasSize = Vector2.new(600, 300)
+surfaceGuiInput.Parent = inputPart
+
+-- Create Frame for the input GUI
+local frameInput = Instance.new("Frame")
+frameInput.Size = UDim2.new(1, 0, 1, 0)
+frameInput.BackgroundTransparency = 0.4
+frameInput.BackgroundColor3 = Color3.new(0, 0, 0)
+frameInput.BorderSizePixel = 2
+frameInput.Parent = surfaceGuiInput
+
+-- Add rounded corners to the input frame
+local inputCorner = Instance.new("UICorner")
+inputCorner.CornerRadius = UDim.new(0, 20)
+inputCorner.Parent = frameInput
+
+-- TextBox for entering the animation ID
+local animationIdInput = Instance.new("TextBox")
+animationIdInput.Size = UDim2.new(0.8, 0, 0.2, 0)
+animationIdInput.Position = UDim2.new(0.1, 0, 0.4, 0)
+animationIdInput.TextScaled = true
+animationIdInput.BackgroundTransparency = 0.5
+animationIdInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+animationIdInput.PlaceholderText = "Enter Animation ID"
+animationIdInput.Font = Enum.Font.Gotham
+animationIdInput.Parent = frameInput
+
+-- Create the "Run" button
+local runButton = Instance.new("TextButton")
+runButton.Size = UDim2.new(0.3, 0, 0.2, 0)
+runButton.Position = UDim2.new(0.65, 0, 0.7, 0)
+runButton.Text = "Run"
+runButton.TextScaled = true
+runButton.BackgroundTransparency = 0.3
+runButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
+runButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+runButton.Font = Enum.Font.GothamBold
+runButton.Parent = frameInput
+
+-- Create the "Close" button for both GUIs
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0.2, 0, 0.2, 0)
+closeButton.Position = UDim2.new(0.75, 0, 0.1, 0)
+closeButton.Text = "Close"
+closeButton.TextScaled = true
+closeButton.BackgroundTransparency = 0.3
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Parent = frame
+closeButton.Parent = frameInput
+
+-- Function to fade out the GUI
+local function fadeOut(guiFrame)
+    for i = 0, 1, 0.05 do
+        guiFrame.BackgroundTransparency = i
+        wait(0.05)
+    end
+    guiFrame.Visible = false
+end
+
+-- Function to fade in the GUI
+local function fadeIn(guiFrame)
+    guiFrame.Visible = true
+    for i = 1, 0, -0.05 do
+        guiFrame.BackgroundTransparency = i
+        wait(0.05)
+    end
+end
+
+-- Toggle fade for the main GUI
+closeButton.MouseButton1Click:Connect(function()
+    if frame.BackgroundTransparency < 1 then
+        fadeOut(frame)
+        fadeOut(surfaceGui)
+        fadeOut(part)
+    else
+        fadeIn(frame)
+        fadeIn(surfaceGui)
+        fadeIn(part)
+    end
+end)
+
+-- Toggle fade for the input GUI
+closeButton.MouseButton1Click:Connect(function()
+    if frameInput.BackgroundTransparency < 1 then
+        fadeOut(frameInput)
+        fadeOut(surfaceGuiInput)
+        fadeOut(inputPart)
+    else
+        fadeIn(frameInput)
+        fadeIn(surfaceGuiInput)
+        fadeIn(inputPart)
+    end
+end)
+
+-- Variable to hold the current animation track
+local currentAnimTrack = nil
+
+-- Function to run animation
+local function runAnimation()
+    local animId = animationIdInput.Text
+    if animId and animId ~= "" then
+        local animation = Instance.new("Animation")
+        animation.AnimationId = "rbxassetid://" .. animId
+        currentAnimTrack = animator:LoadAnimation(animation)
+        currentAnimTrack:Play()
+
+        -- Change the "Run" button to a "Stop" button
+        runButton.Text = "Stop"
+        runButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    end
+end
+
+-- Function to stop the animation
+local function stopAnimation()
+    if currentAnimTrack then
+        currentAnimTrack:Stop()
+        currentAnimTrack = nil
+
+        -- Revert the button back to "Run"
+        runButton.Text = "Run"
+        runButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
+    end
+end
+
+-- Add functionality to toggle between running and stopping the animation
+runButton.MouseButton1Click:Connect(function()
+    if runButton.Text == "Run" then
+        runAnimation()
+    else
+        stopAnimation()
+    end
+end)
+
+-- Update GUI positions to follow the player smoothly
+game:GetService("RunService").RenderStepped:Connect(function()
+    local targetPosition = head.CFrame * CFrame.new(0, 12, -5)
+    local lookAtPosition = head.Position
+    part.CFrame = part.CFrame:Lerp(CFrame.new(targetPosition.Position, lookAtPosition), 0.05)
+
+    -- Position the input GUI to the right of the main GUI
+    local inputTargetPosition = head.CFrame * CFrame.new(10, 10, -5) -- Shifted to the right
+    inputPart.CFrame = inputPart.CFrame:Lerp(CFrame.new(inputTargetPosition.Position, lookAtPosition), 0.05)
+end)
+
+-- Add a "Back" face to the GUI to make it visible from the back as well
+local function createBackFace(part, color)
+    local backSurfaceGui = Instance.new("SurfaceGui")
+    backSurfaceGui.Adornee = part
+    backSurfaceGui.Face = Enum.NormalId.Back
+    backSurfaceGui.CanvasSize = Vector2.new(600, 300)
+    backSurfaceGui.Parent = part
+
+    local backFrame = Instance.new("Frame")
+    backFrame.Size = UDim2.new(1, 0, 1, 0)
+    backFrame.BackgroundTransparency = 0.7
+    backFrame.BackgroundColor3 = color
+    backFrame.BorderSizePixel = 2
+    backFrame.Parent = backSurfaceGui
+
+    local backCorner = Instance.new("UICorner")
+    backCorner.CornerRadius = UDim.new(0, 20)
+    backCorner.Parent = backFrame
+end
+
+-- Create the back faces for both GUI parts
+createBackFace(part, Color3.fromRGB(0, 0, 0), 0.5)  -- Black for the main GUI
+createBackFace(inputPart, Color3.fromRGB(0, 0, 0), 0.5)  -- Black for the input GUI
 
