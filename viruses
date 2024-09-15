@@ -1,481 +1,224 @@
--- all 3d
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local head = character:WaitForChild("Head")
+--all 3D respawn
 
--- Create the floating part for the GUI
-local part = Instance.new("Part")
-part.Size = Vector3.new(10, 5, 0.1)
-part.Anchored = true
-part.CanCollide = false
-part.Transparency = 1
-part.Parent = workspace
 
--- Create SurfaceGui for the front
-local surfaceGuiFront = Instance.new("SurfaceGui")
-surfaceGuiFront.Adornee = part
-surfaceGuiFront.Face = Enum.NormalId.Front
-surfaceGuiFront.CanvasSize = Vector2.new(600, 300)
-surfaceGuiFront.Parent = part
 
--- Create Frame with a transparent background for the front
-local frameFront = Instance.new("Frame")
-frameFront.Size = UDim2.new(1, 0, 1, 0)
-frameFront.BackgroundTransparency = 0.4 -- More transparency
-frameFront.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
-frameFront.BorderSizePixel = 2
-frameFront.Parent = surfaceGuiFront
 
--- Add rounded corners to the front frame
-local cornerFront = Instance.new("UICorner")
-cornerFront.CornerRadius = UDim.new(0, 20) -- Adjust corner radius for roundness (higher number = more round)
-cornerFront.Parent = frameFront
 
--- Add the username and profile picture
-local usernameLabel = Instance.new("TextLabel")
-usernameLabel.Size = UDim2.new(0.6, 0, 0.2, 0)
-usernameLabel.Position = UDim2.new(0.2, 0, 0.1, 0)
-usernameLabel.Text = player.DisplayName .. " (@ " .. player.Name .. ")" -- Username and Display Name
-usernameLabel.TextScaled = true
-usernameLabel.BackgroundTransparency = 1
-usernameLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White color
-usernameLabel.Font = Enum.Font.GothamBold
-usernameLabel.Parent = frameFront
 
--- Add rounded corners to the username label
-local usernameCorner = Instance.new("UICorner")
-usernameCorner.CornerRadius = UDim.new(0, 20)
-usernameCorner.Parent = usernameLabel
+wait(0.5)
 
-local userIdLabel = Instance.new("TextLabel")
-userIdLabel.Size = UDim2.new(0.6, 0, 0.1, 0)
-userIdLabel.Position = UDim2.new(0.2, 0, 0.3, 0)
-userIdLabel.Text = "UserID: " .. player.UserId
-userIdLabel.TextScaled = true
-userIdLabel.BackgroundTransparency = 1
-userIdLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White color
-userIdLabel.Font = Enum.Font.Gotham
-userIdLabel.Parent = frameFront
 
--- Add rounded corners to the userId label
-local userIdCorner = Instance.new("UICorner")
-userIdCorner.CornerRadius = UDim.new(0, 20)
-userIdCorner.Parent = userIdLabel
 
--- Display the profile picture next to the username
-local profileImage = Instance.new("ImageLabel")
-profileImage.Size = UDim2.new(0.2, 0, 0.2, 0)
-profileImage.Position = UDim2.new(0, 0, 0.1, 0)
-profileImage.Image = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=420&h=420"
-profileImage.BackgroundTransparency = 1
-profileImage.Parent = frameFront
 
--- Add rounded corners to the profile image
-local profileCorner = Instance.new("UICorner")
-profileCorner.CornerRadius = UDim.new(0, 20)
-profileCorner.Parent = profileImage
+local currentGui = nil -- To track the current GUI
+local currentPart = nil -- To track the current Part
 
--- Add FPS and Ping indicators
-local fpsLabel = Instance.new("TextLabel")
-fpsLabel.Size = UDim2.new(0.6, 0, 0.1, 0)
-fpsLabel.Position = UDim2.new(0.2, 0, 0.5, 0)
-fpsLabel.Text = "FPS: Calculating..."
-fpsLabel.TextScaled = true
-fpsLabel.BackgroundTransparency = 1
-fpsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-fpsLabel.Font = Enum.Font.Gotham
-fpsLabel.Parent = frameFront
+local function createCurvedPositionGui()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local head = character:WaitForChild("Head")
 
--- Add rounded corners to the FPS label
-local fpsCorner = Instance.new("UICorner")
-fpsCorner.CornerRadius = UDim.new(0, 20)
-fpsCorner.Parent = fpsLabel
-
-local pingLabel = Instance.new("TextLabel")
-pingLabel.Size = UDim2.new(0.6, 0, 0.1, 0)
-pingLabel.Position = UDim2.new(0.2, 0, 0.6, 0)
-pingLabel.Text = "Ping: Calculating..."
-pingLabel.TextScaled = true
-pingLabel.BackgroundTransparency = 1
-pingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-pingLabel.Font = Enum.Font.Gotham
-pingLabel.Parent = frameFront
-
--- Add rounded corners to the ping label
-local pingCorner = Instance.new("UICorner")
-pingCorner.CornerRadius = UDim.new(0, 20)
-pingCorner.Parent = pingLabel
-
--- Show join date
-local joinDateLabel = Instance.new("TextLabel")
-joinDateLabel.Size = UDim2.new(0.6, 0, 0.1, 0)
-joinDateLabel.Position = UDim2.new(0.2, 0, 0.7, 0)
-joinDateLabel.Text = "Join Date: " .. player.AccountAge .. " days"
-joinDateLabel.TextScaled = true
-joinDateLabel.BackgroundTransparency = 1
-joinDateLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-joinDateLabel.Font = Enum.Font.Gotham
-joinDateLabel.Parent = frameFront
-
--- Add rounded corners to the join date label
-local joinDateCorner = Instance.new("UICorner")
-joinDateCorner.CornerRadius = UDim.new(0, 20)
-joinDateCorner.Parent = joinDateLabel
-
--- Create SurfaceGui for the back with transparent color
-local surfaceGuiBack = Instance.new("SurfaceGui")
-surfaceGuiBack.Adornee = part
-surfaceGuiBack.Face = Enum.NormalId.Back
-surfaceGuiBack.CanvasSize = Vector2.new(600, 300)
-surfaceGuiBack.Parent = part
-
--- Create Frame with transparent black background for the back
-local frameBack = Instance.new("Frame")
-frameBack.Size = UDim2.new(1, 0, 1, 0)
-frameBack.BackgroundTransparency = 0.8 -- More transparency
-frameBack.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
-frameBack.BorderSizePixel = 2
-frameBack.Parent = surfaceGuiBack
-
--- Add rounded corners to the back frame
-local cornerBack = Instance.new("UICorner")
-cornerBack.CornerRadius = UDim.new(0, 20)
-cornerBack.Parent = frameBack
-
--- Create the lock GUI button with improved visuals
-local lockButton = Instance.new("TextButton")
-lockButton.Size = UDim2.new(0.2, 0, 0.1, 0)
-lockButton.Position = UDim2.new(0.8, 0, 0, 0) -- Top-right corner
-lockButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255) -- Colorful lock button
-lockButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-lockButton.Font = Enum.Font.GothamBold
-lockButton.Text = "Lock GUI"
-lockButton.Parent = frameFront
-
--- Add rounded corners to the lock button
-local lockButtonCorner = Instance.new("UICorner")
-lockButtonCorner.CornerRadius = UDim.new(0, 20)
-lockButtonCorner.Parent = lockButton
-
--- Lock functionality
-local isLocked = false
-lockButton.MouseButton1Click:Connect(function()
-    isLocked = not isLocked
-    if isLocked then
-        lockButton.Text = "Unlock GUI"
-        lockButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50) -- Change color when locked
-    else
-        lockButton.Text = "Lock GUI"
-        lockButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255) -- Color when unlocked
+    -- Remove the old GUI and part if they exist
+    if currentGui then
+        currentGui:Destroy()
+        currentGui = nil
     end
-end)
-
--- Function to calculate and display FPS and Ping
-local lastTime = tick()
-local fpsCounter = 0
-game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
-    fpsCounter = fpsCounter + 1
-    if tick() - lastTime >= 1 then
-        fpsLabel.Text = "FPS: " .. fpsCounter
-        fpsCounter = 0
-        lastTime = tick()
+    if currentPart then
+        currentPart:Destroy()
+        currentPart = nil
     end
 
-    -- Ping calculation (add your method here)
-    local ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
-    pingLabel.Text = "Ping: " .. ping .. " ms"
-end)
+    -- Create a part to attach the SurfaceGui to
+    local part = Instance.new("Part")
+    part.Size = Vector3.new(10, 5, 0.1) -- Large curved screen size
+    part.Anchored = false
+    part.CanCollide = false
+    part.Transparency = 0.8 -- Make the part semi-transparent (to see a faint outline from the other side)
+    part.BrickColor = BrickColor.new("Really black") -- Set the back side to be a faint black
+    part.Parent = workspace
 
--- Update GUI position and make it follow the player (unless locked)
-game:GetService("RunService").RenderStepped:Connect(function()
-    if not isLocked then
-        local guiPosition = head.CFrame *CFrame.new(5, 2, -5)
-        local lookAtPosition = head.Position
-        local targetCFrame = CFrame.new(guiPosition.Position, lookAtPosition)
-        part.CFrame = part.CFrame:Lerp(targetCFrame, 0.1) -- Slower follow speed for smooth movement
-    end
-end)
-wait(0.6)
--- Ensure this script is a LocalScript
+    -- Track the current part
+    currentPart = part
 
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local head = character:WaitForChild("Head")
-local humanoid = character:WaitForChild("Humanoid")
-
--- Create a part for the floating GUI
-local part = Instance.new("Part")
-part.Size = Vector3.new(10, 5, 0.1)
-part.Anchored = true
-part.CanCollide = false
-part.Transparency = 1
-part.Parent = workspace
-
--- Function to create a SurfaceGui
-local function createSurfaceGui(face)
+    -- Create the SurfaceGui for the curved effect
     local surfaceGui = Instance.new("SurfaceGui")
     surfaceGui.Adornee = part
-    surfaceGui.Face = face
-    surfaceGui.CanvasSize = Vector2.new(400, 200)
+    surfaceGui.Face = Enum.NormalId.Front
+    surfaceGui.CanvasSize = Vector2.new(800, 400) -- Large canvas size
     surfaceGui.Parent = part
 
+    -- Track the current GUI
+    currentGui = surfaceGui
+
+    -- Create a Frame to hold the position display
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    frame.BackgroundTransparency = 0.5
+    frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+    frame.BackgroundTransparency = 0.5 -- Slightly transparent background
+    frame.BorderSizePixel = 0
     frame.Parent = surfaceGui
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
-    corner.Parent = frame
+    -- Title for the GUI
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0.1, 0)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = "Character Position" -- Title for position display
+    title.TextColor3 = Color3.new(1, 1, 1)
+    title.TextScaled = true
+    title.Font = Enum.Font.SourceSansBold
+    title.Parent = frame
 
-    -- Add labels for speed, jump height, and health
-    local speedLabel = Instance.new("TextLabel")
-    speedLabel.Size = UDim2.new(1, 0, 0.3, 0)
-    speedLabel.Position = UDim2.new(0, 0, 0, 0)
-    speedLabel.Text = "Speed: Calculating..."
-    speedLabel.TextScaled = true
-    speedLabel.BackgroundTransparency = 1
-    speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    speedLabel.Font = Enum.Font.Gotham
-    speedLabel.Name = "SpeedLabel"
-    speedLabel.Parent = frame
+    -- TextLabel to display position
+    local positionLabel = Instance.new("TextLabel")
+    positionLabel.Size = UDim2.new(1, 0, 0.5, 0)
+    positionLabel.Position = UDim2.new(0, 0, 0.1, 0)
+    positionLabel.BackgroundTransparency = 1
+    positionLabel.Text = "Position: (0, 0, 0)" -- Initial position text
+    positionLabel.TextColor3 = Color3.new(1, 1, 1)
+    positionLabel.TextScaled = true
+    positionLabel.Font = Enum.Font.SourceSans
+    positionLabel.Parent = frame
 
-    local jumpHeightLabel = Instance.new("TextLabel")
-    jumpHeightLabel.Size = UDim2.new(1, 0, 0.3, 0)
-    jumpHeightLabel.Position = UDim2.new(0, 0, 0.3, 0)
-    jumpHeightLabel.Text = "Jump Height: Calculating..."
-    jumpHeightLabel.TextScaled = true
-    jumpHeightLabel.BackgroundTransparency = 1
-    jumpHeightLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    jumpHeightLabel.Font = Enum.Font.Gotham
-    jumpHeightLabel.Name = "JumpHeightLabel"
-    jumpHeightLabel.Parent = frame
+    -- Function to update the position text
+    local function updatePositionLabel()
+        local charPosition = character.HumanoidRootPart.Position
+        positionLabel.Text = string.format("Position: (%.2f, %.2f, %.2f)", charPosition.X, charPosition.Y, charPosition.Z)
+    end
 
-    local healthLabel = Instance.new("TextLabel")
-    healthLabel.Size = UDim2.new(1, 0, 0.3, 0)
-    healthLabel.Position = UDim2.new(0, 0, 0.6, 0)
-    healthLabel.Text = "Health: Calculating..."
-    healthLabel.TextScaled = true
-    healthLabel.BackgroundTransparency = 1
-    healthLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    healthLabel.Font = Enum.Font.Gotham
-    healthLabel.Name = "HealthLabel"
-    healthLabel.Parent = frame
+    -- Continuously update the position of the character in the GUI
+    game:GetService("RunService").RenderStepped:Connect(updatePositionLabel)
 
-    -- Add lock button
+    -- GUI Position lock/unlock and other buttons...
+    -- Create the Copy Position button
+    local copyButton = Instance.new("TextButton")
+    copyButton.Size = UDim2.new(0.5, 0, 0.2, 0)
+    copyButton.Position = UDim2.new(0.25, 0, 0.7, 0)
+    copyButton.BackgroundColor3 = Color3.new(0, 1, 0) -- Green color for the button
+    copyButton.Text = "Copy Position"
+    copyButton.TextColor3 = Color3.new(1, 1, 1)
+    copyButton.TextScaled = true
+    copyButton.Font = Enum.Font.SourceSansBold
+    copyButton.Parent = frame
+
+    -- Copy position to clipboard when button is clicked
+    copyButton.MouseButton1Click:Connect(function()
+        local charPosition = character.HumanoidRootPart.Position
+        local positionString = string.format("(%.2f, %.2f, %.2f)", charPosition.X, charPosition.Y, charPosition.Z)
+        setclipboard(positionString) -- Copy the position to clipboard
+        print("Position copied to clipboard: " .. positionString)
+
+        -- Update button text to "Copied!" and revert back after 1 second
+        copyButton.Text = "Copied!"
+        task.wait(1) -- Wait for 1 second
+        copyButton.Text = "Copy Position"
+    end)
+
+    -- Create the Mark Position button
+    local markButton = Instance.new("TextButton")
+    markButton.Size = UDim2.new(0.5, 0, 0.2, 0)
+    markButton.Position = UDim2.new(0.25, 0, 0.9, 0)
+    markButton.BackgroundColor3 = Color3.new(0, 0, 1) -- Blue color for the button
+    markButton.Text = "Mark Position"
+    markButton.TextColor3 = Color3.new(1, 1, 1)
+    markButton.TextScaled = true
+    markButton.Font = Enum.Font.SourceSansBold
+    markButton.Parent = frame
+
+    -- Lock/Unlock Button
     local lockButton = Instance.new("TextButton")
     lockButton.Size = UDim2.new(0.2, 0, 0.1, 0)
-    lockButton.Position = UDim2.new(0.8, 0, 0, 0) -- Top-right corner
-    lockButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255) -- Colorful lock button
-    lockButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
-    lockButton.Font = Enum.Font.GothamBold
+    lockButton.Position = UDim2.new(0.8, 0, 0, 0)
+    lockButton.BackgroundColor3 = Color3.new(1, 0, 0)
     lockButton.Text = "Lock GUI"
+    lockButton.TextColor3 = Color3.new(1, 1, 1)
+    lockButton.TextScaled = true
     lockButton.Parent = frame
 
-    return surfaceGui, lockButton, speedLabel, jumpHeightLabel, healthLabel
-end
+    local isGuiLocked = false
+    local lockedPosition = part.Position
 
--- Create SurfaceGui on both sides of the part
-local surfaceGuiFront, lockButtonFront, speedLabelFront, jumpHeightLabelFront, healthLabelFront = createSurfaceGui(Enum.NormalId.Front)
-local surfaceGuiBack, lockButtonBack, speedLabelBack, jumpHeightLabelBack, healthLabelBack = createSurfaceGui(Enum.NormalId.Back)
+    lockButton.MouseButton1Click:Connect(function()
+        isGuiLocked = not isGuiLocked
+        lockButton.Text = isGuiLocked and "Unlock GUI" or "Lock GUI"
 
--- Variables for smooth position updates
-local runService = game:GetService("RunService")
-local lastPosition = character.PrimaryPart.Position
-local lastTick = tick()
-local isLocked = false
-
--- Function to smoothly update the GUI's position
-local function updateGuiPosition()
-    runService.RenderStepped:Connect(function()
-        if not isLocked then
-            local guiPosition = head.CFrame * CFrame.new(0, 5, 5) -- Position slightly in front and above
-            part.CFrame = CFrame.new(part.Position:Lerp(guiPosition.Position, 0.05), head.Position)
+        -- If locked, store the current position to lock the GUI there
+        if isGuiLocked then
+            lockedPosition = part.Position
         end
     end)
+
+    -- Function to make the GUI float smoothly and face the player
+    local function updateGuiPosition()
+        local characterPosition = head.Position
+        local offset = Vector3.new(10, 10, 10) -- Adjust the position slightly to the right and up
+        local targetPosition = characterPosition + offset
+        local movementSpeed = 1 -- Slow and smooth movement
+
+        if not isGuiLocked then
+            part.Position = part.Position:Lerp(targetPosition, movementSpeed * game:GetService("RunService").RenderStepped:Wait())
+            lockedPosition = part.Position
+        else
+            -- Lock the part at the current position
+            part.Position = lockedPosition
+        end
+
+        -- Make the part always face the player
+        part.CFrame = CFrame.new(part.Position, head.Position)
+    end
+
+    -- Continuously update the position of the GUI
+    game:GetService("RunService").RenderStepped:Connect(updateGuiPosition)
 end
 
--- Function to update the GUI with current player stats
-local function updateStats()
-    runService.RenderStepped:Connect(function()
-        -- Update speed
-        local currentSpeed = (character.PrimaryPart.Position - lastPosition).magnitude / (tick() - lastTick)
-        lastPosition = character.PrimaryPart.Position
-        lastTick = tick()
-        speedLabelFront.Text = "Speed: " .. string.format("%.1f", currentSpeed) .. " studs/sec" -- Reduced decimal places
-        speedLabelBack.Text = speedLabelFront.Text
+-- Function to create the GUI when the character spawns
+local function setupCharacter()
+    local player = game.Players.LocalPlayer
 
-        -- Update jump height
-        jumpHeightLabelFront.Text = "Jump Height: " .. string.format("%.1f", humanoid.JumpPower) .. " studs" -- Reduced decimal places
-        jumpHeightLabelBack.Text = jumpHeightLabelFront.Text
+    -- Clean up any lingering GUIs and parts
+    if currentGui then
+        currentGui:Destroy()
+        currentGui = nil
+    end
+    if currentPart then
+        currentPart:Destroy()
+        currentPart = nil
+    end
 
-        -- Update health
-        local healthPercent = (humanoid.Health / humanoid.MaxHealth) * 100
-        healthLabelFront.Text = "Health: " .. string.format("%.0f", healthPercent) .. "%" -- Integer percentage
-        healthLabelBack.Text = healthLabelFront.Text
+    -- Create the curved position GUI for the current character
+    createCurvedPositionGui()
+
+    -- Reconnect for the next respawn
+    player.CharacterAdded:Connect(function(character)
+        -- Clean up the GUI and parts when the character respawns
+        character:WaitForChild("Humanoid").Died:Connect(function()
+            if currentGui then
+                currentGui:Destroy()
+                currentGui = nil
+            end
+            if currentPart then
+                currentPart:Destroy()
+                currentPart = nil
+            end
+        end)
+        setupCharacter() -- Recreate GUI for the new character
     end)
 end
 
--- Lock functionality
-lockButtonFront.MouseButton1Click:Connect(function()
-    isLocked = not isLocked
-    if isLocked then
-        lockButtonFront.Text = "Unlock GUI"
-        lockButtonFront.BackgroundColor3 = Color3.fromRGB(255, 50, 50) -- Change color when locked
-        lockButtonBack.Text = "Unlock GUI"
-        lockButtonBack.BackgroundColor3 = Color3.fromRGB(255, 50, 50) -- Change color when locked
-    else
-        lockButtonFront.Text = "Lock GUI"
-        lockButtonFront.BackgroundColor3 = Color3.fromRGB(50, 50, 255) -- Color when unlocked
-        lockButtonBack.Text = "Lock GUI"
-        lockButtonBack.BackgroundColor3 = Color3.fromRGB(50, 50, 255) -- Color when unlocked
-    end
-end)
+-- Initial setup when the script first runs
+setupCharacter()
 
--- Start updating the GUI position and player stats
-updateGuiPosition()
-updateStats()
-wait(0.7)
--- Ensure this script is a LocalScript
 
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local head = character:WaitForChild("Head")
 
--- Create a part for the floating GUI
-local part = Instance.new("Part")
-part.Size = Vector3.new(10, 5, 0.1)
-part.Anchored = true
-part.CanCollide = false
-part.Transparency = 1
-part.Parent = workspace
 
--- Create the SurfaceGui for the front
-local frontSurfaceGui = Instance.new("SurfaceGui")
-frontSurfaceGui.Adornee = part
-frontSurfaceGui.Face = Enum.NormalId.Front -- Display on the front
-frontSurfaceGui.CanvasSize = Vector2.new(600, 300)
-frontSurfaceGui.Parent = part
 
--- Create a Frame for the front with an outline effect
-local frontFrame = Instance.new("Frame")
-frontFrame.Size = UDim2.new(1, 0, 1, 0)
-frontFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-frontFrame.BorderSizePixel = 4 -- Increase the border to create an outline effect
-frontFrame.BorderColor3 = Color3.fromRGB(0, 255, 0) -- Outline color (green)
-frontFrame.Parent = frontSurfaceGui
 
--- Create a TextLabel for the front
-local frontGlitchLabel = Instance.new("TextLabel")
-frontGlitchLabel.Size = UDim2.new(1, 0, 0.8, 0) -- Leave space for the close button
-frontGlitchLabel.BackgroundTransparency = 1
-frontGlitchLabel.TextColor3 = Color3.new(1, 0, 0) -- Red color
-frontGlitchLabel.Font = Enum.Font.GothamBold -- Fancy font
-frontGlitchLabel.Text = "BY SUSSY (beta version)"
-frontGlitchLabel.TextScaled = true
-frontGlitchLabel.Parent = frontFrame
+wait(0.3)
 
--- Create a SurfaceGui for the back
-local backSurfaceGui = Instance.new("SurfaceGui")
-backSurfaceGui.Adornee = part
-backSurfaceGui.Face = Enum.NormalId.Back -- Display on the back
-backSurfaceGui.CanvasSize = Vector2.new(600, 300)
-backSurfaceGui.Parent = part
 
--- Create a Frame for the back with an outline effect
-local backFrame = Instance.new("Frame")
-backFrame.Size = UDim2.new(1, 0, 1, 0)
-backFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
-backFrame.BorderSizePixel = 4 -- Increase the border to create an outline effect
-backFrame.BorderColor3 = Color3.fromRGB(0, 255, 0) -- Outline color (green)
-backFrame.Parent = backSurfaceGui
 
--- Create a TextLabel for the back
-local backGlitchLabel = Instance.new("TextLabel")
-backGlitchLabel.Size = UDim2.new(1, 0, 0.8, 0) -- Leave space for the close button
-backGlitchLabel.BackgroundTransparency = 1
-backGlitchLabel.TextColor3 = Color3.new(1, 0, 0) -- Red color
-backGlitchLabel.Font = Enum.Font.GothamBold -- Fancy font
-backGlitchLabel.Text = "BY SUSSY"
-backGlitchLabel.TextScaled = true
-backGlitchLabel.Parent = backFrame
 
--- Glitch effect function
-local function applyGlitchEffect(label)
-    while true do
-        label.TextStrokeTransparency = math.random() -- Random glitch effect on text
-        label.Position = UDim2.new(0, math.random(-5, 5), 0, math.random(-5, 5)) -- Small random shifts
-        label.Parent.BackgroundTransparency = math.random(1, 3) * 0.1 -- Random background flicker
-        wait(0.1)
-    end
-end
 
--- Call glitch effect for both front and back labels
-spawn(function() applyGlitchEffect(frontGlitchLabel) end)
-spawn(function() applyGlitchEffect(backGlitchLabel) end)
-
--- Function to create "101010" floating effect
-local function createFloatingText()
-    local text = Instance.new("TextLabel")
-    text.Size = UDim2.new(0, 50, 0, 50)
-    text.Text = math.random(0, 1) -- Randomly choose between 0 and 1
-    text.Font = Enum.Font.GothamBold
-    text.TextColor3 = Color3.fromRGB(255, 255, 255)
-    text.BackgroundTransparency = 1
-    text.TextScaled = true
-    text.Parent = frontFrame
-
-    -- Randomly place around GUI
-    text.Position = UDim2.new(math.random(), 0, math.random(), 0)
-
-    -- Fade and remove after a short time
-    local tween = game:GetService("TweenService"):Create(text, TweenInfo.new(2, Enum.EasingStyle.Linear), {TextTransparency = 1, Position = UDim2.new(math.random(), 0, math.random(), -0.5)})
-    tween:Play()
-    tween.Completed:Connect(function()
-        text:Destroy()
-    end)
-end
-
--- Loop to create floating "101010" text
-spawn(function()
-    while true do
-        createFloatingText()
-        wait(0.5)
-    end
-end)
-
--- Move GUI and make it face the player smoothly
-game:GetService("RunService").RenderStepped:Connect(function()
-    -- Position the GUI in front of the player and make it face the player
-    local guiPosition = head.CFrame * CFrame.new(-3, 2, -5) -- Position slightly in front and to the left
-    local lookAtPosition = head.Position -- Character's head to look at
-    
-    -- Set the GUI's CFrame to face the player smoothly with CFrame.lookAt
-    part.CFrame = CFrame.new(guiPosition.Position, lookAtPosition):Lerp(part.CFrame, 0.95) -- Smooth transition to the new position
-end)
-
--- Create a Close Button on the front
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0.2, 0, 0.2, 0) -- Small button on the top right
-closeButton.Position = UDim2.new(0.8, 0, 0, 0) -- Top-right corner
-closeButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-closeButton.TextColor3 = Color3.new(1, 1, 1)
-closeButton.Font = Enum.Font.GothamBold
-closeButton.Text = "X"
-closeButton.Parent = frontFrame
-
--- Close GUI function
-local function closeGui()
-    part:Destroy()
-end
-
--- Connect close button clicks to close function
-closeButton.MouseButton1Click:Connect(closeGui)
-wait(0.5)
--- Ensure this script is a LocalScript
-
--- Function to create the floating GUI with player join and leave notifications
 local function createFloatingGuiWithNotifications()
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
@@ -568,13 +311,16 @@ local function createFloatingGuiWithNotifications()
     -- Function to update position
     local function updatePosition()
         if not isLocked then
-            local characterPosition = head.Position
-            local offset = Vector3.new(-15, 3, 10) -- Adjust the position to the left and up
-            targetPosition = characterPosition + offset
-            local movementSpeed = 1 -- Slow and smooth movement
+            local head = character:FindFirstChild("Head")
+            if head then
+                local characterPosition = head.Position
+                local offset = Vector3.new(-15, 3, 10) -- Adjust the position to the left and up
+                targetPosition = characterPosition + offset
+                local movementSpeed = 1 -- Slow and smooth movement
 
-            part.Position = part.Position:Lerp(targetPosition, movementSpeed * game:GetService("RunService").RenderStepped:Wait())
-            part.CFrame = CFrame.lookAt(part.Position, characterPosition)
+                part.Position = part.Position:Lerp(targetPosition, movementSpeed * game:GetService("RunService").RenderStepped:Wait())
+                part.CFrame = CFrame.lookAt(part.Position, characterPosition)
+            end
         end
     end
 
@@ -602,11 +348,352 @@ local function createFloatingGuiWithNotifications()
             end
         end
     end)
+    
+    -- Store GUI parts to update them later
+    return {
+        part = part,
+        frame = frame
+    }
 end
 
--- Call the function to create the floating GUI with notifications
-createFloatingGuiWithNotifications()
+-- Function to clean up old GUI
+local function cleanupOldGui(guiParts)
+    if guiParts then
+        if guiParts.part then
+            guiParts.part:Destroy()
+        end
+        if guiParts.frame then
+            guiParts.frame:Destroy()
+        end
+    end
+end
+
+-- Variable to store current GUI parts
+local currentGuiParts = nil
+
+-- Handle player respawn
+local function onCharacterAdded(character)
+    -- Clean up old GUI
+    cleanupOldGui(currentGuiParts)
+    
+    -- Create new GUI
+    currentGuiParts = createFloatingGuiWithNotifications()
+end
+
+-- Connect the function to player respawning
+game.Players.LocalPlayer.CharacterAdded:Connect(onCharacterAdded)
+
+-- Create initial GUI
+onCharacterAdded(game.Players.LocalPlayer.Character)
+
+
+
 wait(0.4)
+
+
+local player = game.Players.LocalPlayer
+local oldGuiParts = {}  -- Table to store references to old GUI parts
+
+local function cleanupOldGui()
+    for _, part in pairs(oldGuiParts) do
+        if part then
+            part:Destroy()
+        end
+    end
+    oldGuiParts = {}  -- Clear the table after cleanup
+end
+
+local function setupGui()
+    cleanupOldGui()  -- Clean up old GUI parts
+
+    -- Ensure the GUI parts are created and set up for the new character
+    local character = player.Character or player.CharacterAdded:Wait()
+    local head = character:WaitForChild("Head")
+    local humanoid = character:WaitForChild("Humanoid")
+    local animator = humanoid:WaitForChild("Animator")
+
+    -- Create the floating part for the main GUI (Animation ID display)
+    local part = Instance.new("Part")
+    part.Size = Vector3.new(10, 5, 0.1)
+    part.Anchored = true
+    part.CanCollide = false
+    part.Transparency = 1
+    part.Parent = workspace
+    table.insert(oldGuiParts, part)  -- Track the part
+
+    -- Create SurfaceGui for the front
+    local surfaceGui = Instance.new("SurfaceGui")
+    surfaceGui.Adornee = part
+    surfaceGui.Face = Enum.NormalId.Front
+    surfaceGui.CanvasSize = Vector2.new(600, 300)
+    surfaceGui.Parent = part
+
+    -- Create Frame for the GUI
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundTransparency = 0.4
+    frame.BackgroundColor3 = Color3.new(0, 0, 0)
+    frame.BorderSizePixel = 2
+    frame.Parent = surfaceGui
+
+    -- Add rounded corners to the frame
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 20)
+    corner.Parent = frame
+
+    -- TextLabel for displaying the Animation ID
+    local animationIdLabel = Instance.new("TextLabel")
+    animationIdLabel.Size = UDim2.new(1, 0, 0.2, 0)
+    animationIdLabel.Position = UDim2.new(0, 0, 0.4, 0)
+    animationIdLabel.TextScaled = true
+    animationIdLabel.BackgroundTransparency = 1
+    animationIdLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    animationIdLabel.Font = Enum.Font.GothamBold
+    animationIdLabel.Text = "Animation ID: None"
+    animationIdLabel.Parent = frame
+
+    -- Add rounded corners to the label
+    local animationIdCorner = Instance.new("UICorner")
+    animationIdCorner.CornerRadius = UDim.new(0, 20)
+    animationIdCorner.Parent = animationIdLabel
+
+    -- Function to update the Animation ID in real-time
+    local function updateAnimationId(animTrack)
+        if animTrack and animTrack.Animation then
+            local animId = tostring(animTrack.Animation.AnimationId):match("%d+")
+            animationIdLabel.Text = "Animation ID: " .. animId
+        else
+            animationIdLabel.Text = "Animation ID: None"
+        end
+    end
+
+    -- Monitor animations being played by the humanoid
+    animator.AnimationPlayed:Connect(function(animTrack)
+        updateAnimationId(animTrack)
+
+        -- Detect when the animation stops playing
+        animTrack.Stopped:Connect(function()
+            animationIdLabel.Text = "Animation ID: None"
+        end)
+    end)
+
+    -- Create the floating part for the new input GUI (right side)
+    local inputPart = Instance.new("Part")
+    inputPart.Size = Vector3.new(10, 5, 0.1)
+    inputPart.Anchored = true
+    inputPart.CanCollide = false
+    inputPart.Transparency = 1
+    inputPart.Parent = workspace
+    table.insert(oldGuiParts, inputPart)  -- Track the part
+
+    -- Create SurfaceGui for the input GUI
+    local surfaceGuiInput = Instance.new("SurfaceGui")
+    surfaceGuiInput.Adornee = inputPart
+    surfaceGuiInput.Face = Enum.NormalId.Front
+    surfaceGuiInput.CanvasSize = Vector2.new(600, 300)
+    surfaceGuiInput.Parent = inputPart
+
+    -- Create Frame for the input GUI
+    local frameInput = Instance.new("Frame")
+    frameInput.Size = UDim2.new(1, 0, 1, 0)
+    frameInput.BackgroundTransparency = 0.4
+    frameInput.BackgroundColor3 = Color3.new(0, 0, 0)
+    frameInput.BorderSizePixel = 2
+    frameInput.Parent = surfaceGuiInput
+
+    -- Add rounded corners to the input frame
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 20)
+    inputCorner.Parent = frameInput
+
+    -- TextBox for entering the animation ID
+    local animationIdInput = Instance.new("TextBox")
+    animationIdInput.Size = UDim2.new(0.8, 0, 0.2, 0)
+    animationIdInput.Position = UDim2.new(0.1, 0, 0.4, 0)
+    animationIdInput.TextScaled = true
+    animationIdInput.BackgroundTransparency = 0.5
+    animationIdInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+    animationIdInput.PlaceholderText = "Enter Animation ID"
+    animationIdInput.Font = Enum.Font.Gotham
+    animationIdInput.Parent = frameInput
+
+    -- Create the "Run" button
+    local runButton = Instance.new("TextButton")
+    runButton.Size = UDim2.new(0.3, 0, 0.2, 0)
+    runButton.Position = UDim2.new(0.65, 0, 0.7, 0)
+    runButton.Text = "Run"
+    runButton.TextScaled = true
+    runButton.BackgroundTransparency = 0.3
+    runButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
+    runButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    runButton.Font = Enum.Font.GothamBold
+    runButton.Parent = frameInput
+
+    -- Create the "Close" button for both GUIs
+    local closeButton = Instance.new("TextButton")
+    closeButton.Size = UDim2.new(0.2, 0, 0.2, 0)
+    closeButton.Position = UDim2.new(0.75, 0, 0.1, 0)
+    closeButton.Text = "Close"
+    closeButton.TextScaled = true
+    closeButton.BackgroundTransparency = 0.3
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.Parent = frame
+    closeButton.Parent = frameInput
+
+    -- Function to fade out the GUI
+    local function fadeOut(guiFrame)
+        for i = 0, 1, 0.05 do
+            guiFrame.BackgroundTransparency = i
+            wait(0.05)
+        end
+        guiFrame.Visible = false
+    end
+
+    -- Function to fade in the GUI
+    local function fadeIn(guiFrame)
+        guiFrame.Visible = true
+        for i = 1, 0, -0.05 do
+            guiFrame.BackgroundTransparency = i
+            wait(0.05)
+        end
+    end
+
+    -- Toggle fade for the main GUI
+    closeButton.MouseButton1Click:Connect(function()
+        if frame.BackgroundTransparency < 1 then
+            fadeOut(frame)
+            fadeOut(surfaceGui)
+            fadeOut(part)
+        else
+            fadeIn(frame)
+            fadeIn(surfaceGui)
+            fadeIn(part)
+        end
+    end)
+
+    -- Toggle fade for the input GUI
+    closeButton.MouseButton1Click:Connect(function()
+        if frameInput.BackgroundTransparency < 1 then
+            fadeOut(frameInput)
+            fadeOut(surfaceGuiInput)
+            fadeOut(inputPart)
+        else
+            fadeIn(frameInput)
+            fadeIn(surfaceGuiInput)
+            fadeIn(inputPart)
+        end
+    end)
+
+    -- Variable to hold the current animation track
+    local currentAnimTrack = nil
+
+    -- Function to run animation
+    local function runAnimation()
+        local animId = animationIdInput.Text
+        if animId and animId ~= "" then
+            local animation = Instance.new("Animation")
+            animation.AnimationId = "rbxassetid://" .. animId
+            currentAnimTrack = animator:LoadAnimation(animation)
+            currentAnimTrack:Play()
+
+            -- Change the "Run" button to a "Stop" button
+            runButton.Text = "Stop"
+            runButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+        end
+    end
+
+    -- Function to stop the animation
+    local function stopAnimation()
+        if currentAnimTrack then
+            currentAnimTrack:Stop()
+            currentAnimTrack = nil
+
+            -- Revert the button back to "Run"
+            runButton.Text = "Run"
+            runButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
+        end
+    end
+
+    -- Add functionality to toggle between running and stopping the animation
+    runButton.MouseButton1Click:Connect(function()
+        if runButton.Text == "Run" then
+            runAnimation()
+        else
+            stopAnimation()
+        end
+    end)
+
+    -- Update GUI positions to follow the player smoothly
+    game:GetService("RunService").RenderStepped:Connect(function()
+        local head = character:FindFirstChild("Head")
+        if head then
+            local targetPosition = head.CFrame * CFrame.new(0, 12, -5)
+            local lookAtPosition = head.Position
+            part.CFrame = part.CFrame:Lerp(CFrame.new(targetPosition.Position, lookAtPosition), 0.05)
+
+            -- Position the input GUI to the right of the main GUI
+            local inputTargetPosition = head.CFrame * CFrame.new(10, 10, -5) -- Shifted to the right
+            inputPart.CFrame = inputPart.CFrame:Lerp(CFrame.new(inputTargetPosition.Position, lookAtPosition), 0.05)
+        end
+    end)
+
+    -- Add a "Back" face to the GUI to make it visible from the back as well
+    local function createBackFace(part, color)
+        local backSurfaceGui = Instance.new("SurfaceGui")
+        backSurfaceGui.Adornee = part
+        backSurfaceGui.Face = Enum.NormalId.Back
+        backSurfaceGui.CanvasSize = Vector2.new(600, 300)
+        backSurfaceGui.Parent = part
+
+        local backFrame = Instance.new("Frame")
+        backFrame.Size = UDim2.new(1, 0, 1, 0)
+        backFrame.BackgroundTransparency = 0.7
+        backFrame.BackgroundColor3 = color
+        backFrame.BorderSizePixel = 2
+        backFrame.Parent = backSurfaceGui
+
+        local backCorner = Instance.new("UICorner")
+        backCorner.CornerRadius = UDim.new(0, 20)
+        backCorner.Parent = backFrame
+    end
+
+    -- Create the back faces for both GUI parts
+    createBackFace(part, Color3.fromRGB(0, 0, 0))  -- Black for the main GUI
+    createBackFace(inputPart, Color3.fromRGB(0, 0, 0))  -- Black for the input GUI
+
+    -- Store GUI parts to update them later
+    return {
+        part = part,
+        inputPart = inputPart,
+        frame = frame,
+        frameInput = frameInput
+    }
+end
+
+-- Initial setup
+local gui = setupGui()
+
+-- Handle respawning
+player.CharacterAdded:Connect(function()
+    gui = setupGui()  -- Recreate GUI for the new character
+end)
+
+
+
+
+
+wait(0.5)
+
+
+
+
+
+
+
+
+-- Function to create or recreate the GUI
 -- Ensure this script is a LocalScript
 
 -- Function to create the floating curved GUI
@@ -617,10 +704,11 @@ local function createCurvedPlayerListGui()
 
     -- Create a part to attach the SurfaceGui to
     local part = Instance.new("Part")
-    part.Size = Vector3.new(10, 5, 0.1) -- Large curved screen size
+    part.Size = Vector3.new(10, 5, 0.001) -- Large curved screen size
     part.Anchored = false
     part.CanCollide = false
-    part.Transparency = 1 -- Make the part invisible
+    part.Transparency = 0.8 -- Set the transparency to make the part semi-transparent
+    part.BrickColor = BrickColor.new("Really black") -- Set the color to black
     part.Parent = workspace
 
     -- Create the SurfaceGui for the curved effect
@@ -633,7 +721,7 @@ local function createCurvedPlayerListGui()
     -- Create a Frame to hold the player list
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+    frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1) -- Dark background color
     frame.BackgroundTransparency = 0.5 -- Slightly transparent background
     frame.BorderSizePixel = 0
     frame.Parent = surfaceGui
@@ -663,14 +751,70 @@ local function createCurvedPlayerListGui()
     listLayout.Padding = UDim.new(0, 5)
     listLayout.Parent = scrollingFrame
 
+    -- Table to track favorite players
+    local favoritePlayers = {}
+    -- Table to keep track of displayed players
+    local playerEntries = {}
+
+    local function createNotification(message)
+        local notificationGui = Instance.new("ScreenGui")
+        notificationGui.Parent = player:WaitForChild("PlayerGui")
+
+        local notificationFrame = Instance.new("Frame")
+        notificationFrame.Size = UDim2.new(0.3, 0, 0.1, 0)
+        notificationFrame.Position = UDim2.new(0.35, 0, 0.8, 0)
+        notificationFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+        notificationFrame.BackgroundTransparency = 0.3
+        notificationFrame.Parent = notificationGui
+
+        local notificationText = Instance.new("TextLabel")
+        notificationText.Size = UDim2.new(1, 0, 0.7, 0)
+        notificationText.Position = UDim2.new(0, 0, 0, 0)
+        notificationText.BackgroundTransparency = 1
+        notificationText.Text = message
+        notificationText.TextColor3 = Color3.new(1, 1, 1)
+        notificationText.TextScaled = true
+        notificationText.Font = Enum.Font.SourceSansBold
+        notificationText.Parent = notificationFrame
+
+        -- Copy buttons
+        local copyNameButton = Instance.new("TextButton")
+        copyNameButton.Size = UDim2.new(0.5, 0, 0.3, 0)
+        copyNameButton.Position = UDim2.new(0, 0, 0.7, 0)
+        copyNameButton.BackgroundColor3 = Color3.new(1, 0.5, 0)
+        copyNameButton.Text = "Copy Name"
+        copyNameButton.TextColor3 = Color3.new(1, 1, 1)
+        copyNameButton.TextScaled = true
+        copyNameButton.Parent = notificationFrame
+
+        local copyIDButton = Instance.new("TextButton")
+        copyIDButton.Size = UDim2.new(0.5, 0, 0.3, 0)
+        copyIDButton.Position = UDim2.new(0.5, 0, 0.7, 0)
+        copyIDButton.BackgroundColor3 = Color3.new(1, 0.5, 0)
+        copyIDButton.Text = "Copy ID"
+        copyIDButton.TextColor3 = Color3.new(1, 1, 1)
+        copyIDButton.TextScaled = true
+        copyIDButton.Parent = notificationFrame
+
+        -- Auto remove notification after 10 seconds
+        task.delay(10, function()
+            notificationGui:Destroy()
+        end)
+
+        return copyNameButton, copyIDButton
+    end
+
     -- Function to update the player list and player count
     local function updatePlayerList()
         -- Clear the list before adding new entries
         for _, child in ipairs(scrollingFrame:GetChildren()) do
-            if child:IsA("TextLabel") then
+            if child:IsA("Frame") then
                 child:Destroy()
             end
         end
+
+        -- Clear the playerEntries table
+        playerEntries = {}
 
         -- Get current players in the game
         local players = game.Players:GetPlayers()
@@ -679,23 +823,95 @@ local function createCurvedPlayerListGui()
         title.Text = string.format("Player List (%d)", #players)
 
         -- Add each player to the list
-        for _, player in ipairs(players) do
-            local playerLabel = Instance.new("TextLabel")
-            playerLabel.Size = UDim2.new(1, 0, 0, 40)
-            playerLabel.BackgroundTransparency = 0.5
-            playerLabel.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-            playerLabel.Text = string.format("%s (%s) - UserID: %d", player.DisplayName, player.Name, player.UserId)
-            playerLabel.TextColor3 = Color3.new(1, 1, 1)
-            playerLabel.TextScaled = true
-            playerLabel.Font = Enum.Font.SourceSans
-            playerLabel.Parent = scrollingFrame
+        local totalHeight = 0
+        for _, p in ipairs(players) do
+            -- Skip players that are already in the list
+            if not playerEntries[p.UserId] then
+                -- Create the player label
+                local playerLabel = Instance.new("Frame")
+                playerLabel.Size = UDim2.new(1, -50, 0, 40) -- Adjust width to fit favorite button
+                playerLabel.BackgroundTransparency = 0.5
+                playerLabel.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+                playerLabel.BorderSizePixel = 0
+                playerLabel.LayoutOrder = _ -- Ensure correct sorting
+                playerLabel.Parent = scrollingFrame
+
+                local playerText = Instance.new("TextLabel")
+                playerText.Size = UDim2.new(0.8, 0, 1, 0) -- Width for player name
+                playerText.Position = UDim2.new(0, 0, 0, 0)
+                playerText.BackgroundTransparency = 1
+                playerText.Text = string.format("%s (%s) - UserID: %d", p.DisplayName, p.Name, p.UserId)
+                playerText.TextColor3 = Color3.new(1, 1, 1)
+                playerText.TextScaled = true
+                playerText.Font = Enum.Font.SourceSans
+                playerText.Parent = playerLabel
+
+                -- Create the favorite button
+                local favoriteButton = Instance.new("TextButton")
+                favoriteButton.Size = UDim2.new(0.2, 0, 1, 0) -- Button takes up full height
+                favoriteButton.Position = UDim2.new(0.8, 0, 0, 0) -- Align to the right side
+                favoriteButton.BackgroundColor3 = favoritePlayers[p.UserId] and Color3.new(1, 1, 0) or Color3.new(0.5, 0.5, 0.5)
+                favoriteButton.Text = favoritePlayers[p.UserId] and "★" or "☆"
+                favoriteButton.TextColor3 = Color3.new(1, 1, 1)
+                favoriteButton.TextScaled = true
+                favoriteButton.Font = Enum.Font.SourceSans
+                favoriteButton.Parent = playerLabel
+
+                -- Toggle favorite
+                favoriteButton.MouseButton1Click:Connect(function()
+                    favoritePlayers[p.UserId] = not favoritePlayers[p.UserId]
+                    favoriteButton.BackgroundColor3 = favoritePlayers[p.UserId] and Color3.new(1, 1, 0) or Color3.new(0.5, 0.5, 0.5)
+                    favoriteButton.Text = favoritePlayers[p.UserId] and "★" or "☆"
+                end)
+
+                -- Mark player as displayed
+                playerEntries[p.UserId] = true
+
+                -- Calculate the total height of the content
+                totalHeight = totalHeight + playerLabel.Size.Y.Offset + listLayout.Padding.Offset
+            end
         end
+
+        -- Update the CanvasSize of the ScrollingFrame to fit all content
+        scrollingFrame.CanvasSize = UDim2.new(1, 0, 0, totalHeight)
+    end
+
+    -- Notify when favorite player joins or leaves
+    local function onPlayerAdded(p)
+        if favoritePlayers[p.UserId] then
+            local copyNameButton, copyIDButton = createNotification(string.format("Your favorite player %s joined!", p.DisplayName))
+
+            -- Copy player name and ID
+            copyNameButton.MouseButton1Click:Connect(function()
+                setclipboard(p.Name)
+            end)
+            copyIDButton.MouseButton1Click:Connect(function()
+                setclipboard(tostring(p.UserId)) -- Ensure only the numeric ID is copied
+            end)
+        end
+        updatePlayerList()
+    end
+
+    local function onPlayerRemoving(p)
+        if favoritePlayers[p.UserId] then
+            local copyNameButton, copyIDButton = createNotification(string.format("Your favorite player %s left!", p.DisplayName))
+
+            -- Copy player name and ID
+            copyNameButton.MouseButton1Click:Connect(function()
+                setclipboard(p.Name)
+            end)
+            copyIDButton.MouseButton1Click:Connect(function()
+                setclipboard(tostring(p.UserId)) -- Ensure only the numeric ID is copied
+            end)
+        end
+        updatePlayerList()
     end
 
     -- Update player list on player join or leave
-    game.Players.PlayerAdded:Connect(updatePlayerList)
-    game.Players.PlayerRemoving:Connect(updatePlayerList)
-    updatePlayerList() -- Initial update
+    game.Players.PlayerAdded:Connect(onPlayerAdded)
+    game.Players.PlayerRemoving:Connect(onPlayerRemoving)
+    -- Initial player list update
+    updatePlayerList()
 
     -- Function to make the GUI float smoothly and face the player
     local isGuiLocked = false
@@ -716,10 +932,10 @@ local function createCurvedPlayerListGui()
         end
 
         -- Make the part always face the player
-        part.CFrame = CFrame.lookAt(part.Position, characterPosition)
+        part.CFrame = CFrame.new(part.Position, head.Position)
     end
 
-    -- Update the position every frame
+    -- Continuously update the position of the GUI
     game:GetService("RunService").RenderStepped:Connect(updatePosition)
 
     -- Create a button to lock/unlock the GUI
@@ -741,19 +957,33 @@ local function createCurvedPlayerListGui()
             lockedPosition = part.Position
         end
     end)
+
+    -- Ensure GUI is correctly reparented on respawn
+    player.CharacterAdded:Connect(function(char)
+        -- Reattach the part to the player's new character
+        head = char:WaitForChild("Head")
+        part.Parent = workspace
+    end)
 end
 
--- Call the function to create the floating player list GUI
+-- Call the function to create the GUI
 createCurvedPlayerListGui()
-wait(0.4)
--- Get the player's details
+
+
+
+wait(0.5)
+
+
+
+
+-- Ensure this script is a LocalScript
+
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local head = character:WaitForChild("Head")
 local humanoid = character:WaitForChild("Humanoid")
-local animator = humanoid:WaitForChild("Animator")
 
--- Create the floating part for the main GUI (Animation ID display)
+-- Create a part for the floating GUI (don't create again after respawn)
 local part = Instance.new("Part")
 part.Size = Vector3.new(10, 5, 0.1)
 part.Anchored = true
@@ -761,241 +991,514 @@ part.CanCollide = false
 part.Transparency = 1
 part.Parent = workspace
 
--- Create SurfaceGui for the front
-local surfaceGui = Instance.new("SurfaceGui")
-surfaceGui.Adornee = part
-surfaceGui.Face = Enum.NormalId.Front
-surfaceGui.CanvasSize = Vector2.new(600, 300)
-surfaceGui.Parent = part
+-- Function to create a SurfaceGui
+local function createSurfaceGui(face)
+    local surfaceGui = Instance.new("SurfaceGui")
+    surfaceGui.Adornee = part
+    surfaceGui.Face = face
+    surfaceGui.CanvasSize = Vector2.new(400, 200)
+    surfaceGui.Parent = part
 
--- Create Frame for the GUI
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(1, 0, 1, 0)
-frame.BackgroundTransparency = 0.4
-frame.BackgroundColor3 = Color3.new(0, 0, 0)
-frame.BorderSizePixel = 2
-frame.Parent = surfaceGui
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    frame.BackgroundTransparency = 0.5
+    frame.Parent = surfaceGui
 
--- Add rounded corners to the frame
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 20)
-corner.Parent = frame
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = frame
 
--- TextLabel for displaying the Animation ID
-local animationIdLabel = Instance.new("TextLabel")
-animationIdLabel.Size = UDim2.new(1, 0, 0.2, 0)
-animationIdLabel.Position = UDim2.new(0, 0, 0.4, 0)
-animationIdLabel.TextScaled = true
-animationIdLabel.BackgroundTransparency = 1
-animationIdLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-animationIdLabel.Font = Enum.Font.GothamBold
-animationIdLabel.Text = "Animation ID: None"
-animationIdLabel.Parent = frame
+    -- Add labels for speed, jump height, and health
+    local speedLabel = Instance.new("TextLabel")
+    speedLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    speedLabel.Position = UDim2.new(0, 0, 0, 0)
+    speedLabel.Text = "Speed: Calculating..."
+    speedLabel.TextScaled = true
+    speedLabel.BackgroundTransparency = 1
+    speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    speedLabel.Font = Enum.Font.Gotham
+    speedLabel.Name = "SpeedLabel"
+    speedLabel.Parent = frame
 
--- Add rounded corners to the label
-local animationIdCorner = Instance.new("UICorner")
-animationIdCorner.CornerRadius = UDim.new(0, 20)
-animationIdCorner.Parent = animationIdLabel
+    local jumpHeightLabel = Instance.new("TextLabel")
+    jumpHeightLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    jumpHeightLabel.Position = UDim2.new(0, 0, 0.3, 0)
+    jumpHeightLabel.Text = "Jump Height: Calculating..."
+    jumpHeightLabel.TextScaled = true
+    jumpHeightLabel.BackgroundTransparency = 1
+    jumpHeightLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    jumpHeightLabel.Font = Enum.Font.Gotham
+    jumpHeightLabel.Name = "JumpHeightLabel"
+    jumpHeightLabel.Parent = frame
 
--- Function to update the Animation ID in real-time
-local function updateAnimationId(animTrack)
-    if animTrack and animTrack.Animation then
-        local animId = tostring(animTrack.Animation.AnimationId):match("%d+")
-        animationIdLabel.Text = "Animation ID: " .. animId
-    else
-        animationIdLabel.Text = "Animation ID: None"
-    end
+    local healthLabel = Instance.new("TextLabel")
+    healthLabel.Size = UDim2.new(1, 0, 0.3, 0)
+    healthLabel.Position = UDim2.new(0, 0, 0.6, 0)
+    healthLabel.Text = "Health: Calculating..."
+    healthLabel.TextScaled = true
+    healthLabel.BackgroundTransparency = 1
+    healthLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    healthLabel.Font = Enum.Font.Gotham
+    healthLabel.Name = "HealthLabel"
+    healthLabel.Parent = frame
+
+    -- Add lock button
+    local lockButton = Instance.new("TextButton")
+    lockButton.Size = UDim2.new(0.2, 0, 0.1, 0)
+    lockButton.Position = UDim2.new(0.8, 0, 0, 0) -- Top-right corner
+    lockButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255) -- Colorful lock button
+    lockButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+    lockButton.Font = Enum.Font.GothamBold
+    lockButton.Text = "Lock GUI"
+    lockButton.Parent = frame
+
+    return surfaceGui, lockButton, speedLabel, jumpHeightLabel, healthLabel
 end
 
--- Monitor animations being played by the humanoid
-animator.AnimationPlayed:Connect(function(animTrack)
-    updateAnimationId(animTrack)
+-- Create SurfaceGui on both sides of the part
+local surfaceGuiFront, lockButtonFront, speedLabelFront, jumpHeightLabelFront, healthLabelFront = createSurfaceGui(Enum.NormalId.Front)
+local surfaceGuiBack, lockButtonBack, speedLabelBack, jumpHeightLabelBack, healthLabelBack = createSurfaceGui(Enum.NormalId.Back)
 
-    -- Detect when the animation stops playing
-    animTrack.Stopped:Connect(function()
-        animationIdLabel.Text = "Animation ID: None"
+-- Variables for smooth position updates
+local runService = game:GetService("RunService")
+local lastPosition = character.PrimaryPart.Position
+local lastTick = tick()
+local isLocked = false
+
+-- Variables to track connections
+local guiPositionConnection
+local statsUpdateConnection
+
+-- Function to smoothly update the GUI's position
+local function updateGuiPosition()
+    if guiPositionConnection then
+        guiPositionConnection:Disconnect() -- Disconnect previous connection
+    end
+
+    guiPositionConnection = runService.RenderStepped:Connect(function()
+        if not isLocked then
+            local guiPosition = head.CFrame * CFrame.new(0, 5, 5) -- Position slightly in front and above
+            part.CFrame = CFrame.new(part.Position:Lerp(guiPosition.Position, 0.05), head.Position)
+        end
     end)
-end)
-
--- Create the floating part for the new input GUI (right side)
-local inputPart = Instance.new("Part")
-inputPart.Size = Vector3.new(10, 5, 0.1)
-inputPart.Anchored = true
-inputPart.CanCollide = false
-inputPart.Transparency = 1
-inputPart.Parent = workspace
-
--- Create SurfaceGui for the input GUI
-local surfaceGuiInput = Instance.new("SurfaceGui")
-surfaceGuiInput.Adornee = inputPart
-surfaceGuiInput.Face = Enum.NormalId.Front
-surfaceGuiInput.CanvasSize = Vector2.new(600, 300)
-surfaceGuiInput.Parent = inputPart
-
--- Create Frame for the input GUI
-local frameInput = Instance.new("Frame")
-frameInput.Size = UDim2.new(1, 0, 1, 0)
-frameInput.BackgroundTransparency = 0.4
-frameInput.BackgroundColor3 = Color3.new(0, 0, 0)
-frameInput.BorderSizePixel = 2
-frameInput.Parent = surfaceGuiInput
-
--- Add rounded corners to the input frame
-local inputCorner = Instance.new("UICorner")
-inputCorner.CornerRadius = UDim.new(0, 20)
-inputCorner.Parent = frameInput
-
--- TextBox for entering the animation ID
-local animationIdInput = Instance.new("TextBox")
-animationIdInput.Size = UDim2.new(0.8, 0, 0.2, 0)
-animationIdInput.Position = UDim2.new(0.1, 0, 0.4, 0)
-animationIdInput.TextScaled = true
-animationIdInput.BackgroundTransparency = 0.5
-animationIdInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-animationIdInput.PlaceholderText = "Enter Animation ID"
-animationIdInput.Font = Enum.Font.Gotham
-animationIdInput.Parent = frameInput
-
--- Create the "Run" button
-local runButton = Instance.new("TextButton")
-runButton.Size = UDim2.new(0.3, 0, 0.2, 0)
-runButton.Position = UDim2.new(0.65, 0, 0.7, 0)
-runButton.Text = "Run"
-runButton.TextScaled = true
-runButton.BackgroundTransparency = 0.3
-runButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
-runButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-runButton.Font = Enum.Font.GothamBold
-runButton.Parent = frameInput
-
--- Create the "Close" button for both GUIs
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0.2, 0, 0.2, 0)
-closeButton.Position = UDim2.new(0.75, 0, 0.1, 0)
-closeButton.Text = "Close"
-closeButton.TextScaled = true
-closeButton.BackgroundTransparency = 0.3
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Font = Enum.Font.GothamBold
-closeButton.Parent = frame
-closeButton.Parent = frameInput
-
--- Function to fade out the GUI
-local function fadeOut(guiFrame)
-    for i = 0, 1, 0.05 do
-        guiFrame.BackgroundTransparency = i
-        wait(0.05)
-    end
-    guiFrame.Visible = false
 end
 
--- Function to fade in the GUI
-local function fadeIn(guiFrame)
-    guiFrame.Visible = true
-    for i = 1, 0, -0.05 do
-        guiFrame.BackgroundTransparency = i
-        wait(0.05)
+-- Function to update the GUI with current player stats
+local function updateStats()
+    if statsUpdateConnection then
+        statsUpdateConnection:Disconnect() -- Disconnect previous connection
     end
+
+    statsUpdateConnection = runService.RenderStepped:Connect(function()
+        -- Update speed
+        local currentSpeed = (character.PrimaryPart.Position - lastPosition).magnitude / (tick() - lastTick)
+        lastPosition = character.PrimaryPart.Position
+        lastTick = tick()
+        speedLabelFront.Text = "Speed: " .. string.format("%.1f", currentSpeed) .. " studs/sec" -- Reduced decimal places
+        speedLabelBack.Text = speedLabelFront.Text
+
+        -- Update jump height
+        jumpHeightLabelFront.Text = "Jump Height: " .. string.format("%.1f", humanoid.JumpPower) .. " studs" -- Reduced decimal places
+        jumpHeightLabelBack.Text = jumpHeightLabelFront.Text
+
+        -- Update health
+        local healthPercent = (humanoid.Health / humanoid.MaxHealth) * 100
+        healthLabelFront.Text = "Health: " .. string.format("%.0f", healthPercent) .. "%" -- Integer percentage
+        healthLabelBack.Text = healthLabelFront.Text
+    end)
 end
 
--- Toggle fade for the main GUI
-closeButton.MouseButton1Click:Connect(function()
-    if frame.BackgroundTransparency < 1 then
-        fadeOut(frame)
-        fadeOut(surfaceGui)
-        fadeOut(part)
+-- Lock functionality
+lockButtonFront.MouseButton1Click:Connect(function()
+    isLocked = not isLocked
+    if isLocked then
+        lockButtonFront.Text = "Unlock GUI"
+        lockButtonFront.BackgroundColor3 = Color3.fromRGB(255, 50, 50) -- Change color when locked
+        lockButtonBack.Text = "Unlock GUI"
+        lockButtonBack.BackgroundColor3 = Color3.fromRGB(255, 50, 50) -- Change color when locked
     else
-        fadeIn(frame)
-        fadeIn(surfaceGui)
-        fadeIn(part)
+        lockButtonFront.Text = "Lock GUI"
+        lockButtonFront.BackgroundColor3 = Color3.fromRGB(50, 50, 255) -- Color when unlocked
+        lockButtonBack.Text = "Lock GUI"
+        lockButtonBack.BackgroundColor3 = Color3.fromRGB(50, 50, 255) -- Color when unlocked
     end
 end)
 
--- Toggle fade for the input GUI
-closeButton.MouseButton1Click:Connect(function()
-    if frameInput.BackgroundTransparency < 1 then
-        fadeOut(frameInput)
-        fadeOut(surfaceGuiInput)
-        fadeOut(inputPart)
-    else
-        fadeIn(frameInput)
-        fadeIn(surfaceGuiInput)
-        fadeIn(inputPart)
-    end
+-- Start updating the GUI position and player stats
+updateGuiPosition()
+updateStats()
+
+-- Handle respawn and re-attach GUI to the new character
+player.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+    head = newCharacter:WaitForChild("Head")
+    humanoid = newCharacter:WaitForChild("Humanoid")
+    
+    -- Update the GUI position and stats for the new character
+    lastPosition = newCharacter.PrimaryPart.Position
+    updateGuiPosition()
+    updateStats()
 end)
 
--- Variable to hold the current animation track
-local currentAnimTrack = nil
 
--- Function to run animation
-local function runAnimation()
-    local animId = animationIdInput.Text
-    if animId and animId ~= "" then
-        local animation = Instance.new("Animation")
-        animation.AnimationId = "rbxassetid://" .. animId
-        currentAnimTrack = animator:LoadAnimation(animation)
-        currentAnimTrack:Play()
 
-        -- Change the "Run" button to a "Stop" button
-        runButton.Text = "Stop"
-        runButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+
+wait(0.4)
+
+
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local head = character:WaitForChild("Head")
+
+-- Function to initialize GUI
+local function initializeGUI()
+    -- Remove any existing parts
+    local existingPart = workspace:FindFirstChild("FloatingPart")
+    if existingPart then
+        existingPart:Destroy()
+    end
+
+    -- Create the floating part for the GUI
+    local part = Instance.new("Part")
+    part.Name = "FloatingPart" -- Give it a name for easy identification
+    part.Size = Vector3.new(10, 5, 0.1)
+    part.Anchored = true
+    part.CanCollide = false
+    part.Transparency = 1
+    part.Parent = workspace
+
+    -- Create SurfaceGui for the front
+    local surfaceGuiFront = Instance.new("SurfaceGui")
+    surfaceGuiFront.Adornee = part
+    surfaceGuiFront.Face = Enum.NormalId.Front
+    surfaceGuiFront.CanvasSize = Vector2.new(600, 300)
+    surfaceGuiFront.Parent = part
+
+    -- Create Frame with a transparent background for the front
+    local frameFront = Instance.new("Frame")
+    frameFront.Size = UDim2.new(1, 0, 1, 0)
+    frameFront.BackgroundTransparency = 0.4 -- More transparency
+    frameFront.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
+    frameFront.BorderSizePixel = 2
+    frameFront.Parent = surfaceGuiFront
+
+    -- Add rounded corners to the front frame
+    local cornerFront = Instance.new("UICorner")
+    cornerFront.CornerRadius = UDim.new(0, 20) -- Adjust corner radius for roundness (higher number = more round)
+    cornerFront.Parent = frameFront
+
+    -- Add the username and profile picture
+    local usernameLabel = Instance.new("TextLabel")
+    usernameLabel.Size = UDim2.new(0.6, 0, 0.2, 0)
+    usernameLabel.Position = UDim2.new(0.2, 0, 0.1, 0)
+    usernameLabel.Text = player.DisplayName .. " (@ " .. player.Name .. ")" -- Username and Display Name
+    usernameLabel.TextScaled = true
+    usernameLabel.BackgroundTransparency = 1
+    usernameLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White color
+    usernameLabel.Font = Enum.Font.GothamBold
+    usernameLabel.Parent = frameFront
+
+    -- Add rounded corners to the username label
+    local usernameCorner = Instance.new("UICorner")
+    usernameCorner.CornerRadius = UDim.new(0, 20)
+    usernameCorner.Parent = usernameLabel
+
+    local userIdLabel = Instance.new("TextLabel")
+    userIdLabel.Size = UDim2.new(0.6, 0, 0.1, 0)
+    userIdLabel.Position = UDim2.new(0.2, 0, 0.3, 0)
+    userIdLabel.Text = "UserID: " .. player.UserId
+    userIdLabel.TextScaled = true
+    userIdLabel.BackgroundTransparency = 1
+    userIdLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White color
+    userIdLabel.Font = Enum.Font.Gotham
+    userIdLabel.Parent = frameFront
+
+    -- Add rounded corners to the userId label
+    local userIdCorner = Instance.new("UICorner")
+    userIdCorner.CornerRadius = UDim.new(0, 20)
+    userIdCorner.Parent = userIdLabel
+
+    -- Display the profile picture next to the username
+    local profileImage = Instance.new("ImageLabel")
+    profileImage.Size = UDim2.new(0.2, 0, 0.2, 0)
+    profileImage.Position = UDim2.new(0, 0, 0.1, 0)
+    profileImage.Image = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=420&h=420"
+    profileImage.BackgroundTransparency = 1
+    profileImage.Parent = frameFront
+
+    -- Add rounded corners to the profile image
+    local profileCorner = Instance.new("UICorner")
+    profileCorner.CornerRadius = UDim.new(0, 20)
+    profileCorner.Parent = profileImage
+
+    -- Add FPS and Ping indicators
+    local fpsLabel = Instance.new("TextLabel")
+    fpsLabel.Size = UDim2.new(0.6, 0, 0.1, 0)
+    fpsLabel.Position = UDim2.new(0.2, 0, 0.5, 0)
+    fpsLabel.Text = "FPS: Calculating..."
+    fpsLabel.TextScaled = true
+    fpsLabel.BackgroundTransparency = 1
+    fpsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    fpsLabel.Font = Enum.Font.Gotham
+    fpsLabel.Parent = frameFront
+
+    -- Add rounded corners to the FPS label
+    local fpsCorner = Instance.new("UICorner")
+    fpsCorner.CornerRadius = UDim.new(0, 20)
+    fpsCorner.Parent = fpsLabel
+
+    local pingLabel = Instance.new("TextLabel")
+    pingLabel.Size = UDim2.new(0.6, 0, 0.1, 0)
+    pingLabel.Position = UDim2.new(0.2, 0, 0.6, 0)
+    pingLabel.Text = "Ping: Calculating..."
+    pingLabel.TextScaled = true
+    pingLabel.BackgroundTransparency = 1
+    pingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    pingLabel.Font = Enum.Font.Gotham
+    pingLabel.Parent = frameFront
+
+    -- Add rounded corners to the ping label
+    local pingCorner = Instance.new("UICorner")
+    pingCorner.CornerRadius = UDim.new(0, 20)
+    pingCorner.Parent = pingLabel
+
+    -- Show join date
+    local joinDateLabel = Instance.new("TextLabel")
+    joinDateLabel.Size = UDim2.new(0.6, 0, 0.1, 0)
+    joinDateLabel.Position = UDim2.new(0.2, 0, 0.7, 0)
+    joinDateLabel.Text = "Join Date: " .. player.AccountAge .. " days"
+    joinDateLabel.TextScaled = true
+    joinDateLabel.BackgroundTransparency = 1
+    joinDateLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    joinDateLabel.Font = Enum.Font.Gotham
+    joinDateLabel.Parent = frameFront
+
+    -- Add rounded corners to the join date label
+    local joinDateCorner = Instance.new("UICorner")
+    joinDateCorner.CornerRadius = UDim.new(0, 20)
+    joinDateCorner.Parent = joinDateLabel
+
+    -- Create SurfaceGui for the back with transparent color
+    local surfaceGuiBack = Instance.new("SurfaceGui")
+    surfaceGuiBack.Adornee = part
+    surfaceGuiBack.Face = Enum.NormalId.Back
+    surfaceGuiBack.CanvasSize = Vector2.new(600, 300)
+    surfaceGuiBack.Parent = part
+
+    -- Create Frame with transparent black background for the back
+    local frameBack = Instance.new("Frame")
+    frameBack.Size = UDim2.new(1, 0, 1, 0)
+    frameBack.BackgroundTransparency = 0.8 -- More transparency
+    frameBack.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
+    frameBack.BorderSizePixel = 2
+    frameBack.Parent = surfaceGuiBack
+
+    -- Add rounded corners to the back frame
+    local cornerBack = Instance.new("UICorner")
+    cornerBack.CornerRadius = UDim.new(0, 20)
+    cornerBack.Parent = frameBack
+
+    -- Create the lock GUI button with improved visuals
+    local lockButton = Instance.new("TextButton")
+    lockButton.Size = UDim2.new(0.2, 0, 0.1, 0)
+    lockButton.Position = UDim2.new(0.8, 0, 0, 0) -- Top-right corner
+    lockButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255) -- Colorful lock button
+    lockButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+    lockButton.Font = Enum.Font.GothamBold
+    lockButton.Text = "Lock GUI"
+    lockButton.Parent = frameFront
+
+    -- Add rounded corners to the lock button
+    local lockButtonCorner = Instance.new("UICorner")
+    lockButtonCorner.CornerRadius = UDim.new(0, 20)
+    lockButtonCorner.Parent = lockButton
+
+    -- Lock functionality
+    local isLocked = false
+    lockButton.MouseButton1Click:Connect(function()
+        isLocked = not isLocked
+        if isLocked then
+            lockButton.Text = "Unlock GUI"
+            lockButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50) -- Change color when locked
+        else
+            lockButton.Text = "Lock GUI"
+            lockButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255) -- Color when unlocked
+        end
+    end)
+
+    -- Function to calculate and display FPS and Ping
+    local lastTime = tick()
+    local fpsCounter = 0
+    game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
+        fpsCounter = fpsCounter + 1
+        if tick() - lastTime >= 1 then
+            fpsLabel.Text = "FPS: " .. fpsCounter
+            fpsCounter = 0
+            lastTime = tick()
+        end
+
+        -- Ping calculation (add your method here)
+        local ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
+        pingLabel.Text = "Ping: " .. ping .. " ms"
+    end)
+
+    -- Update GUI position and make it follow the player (unless locked)
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if not isLocked then
+            local guiPosition = head.CFrame * CFrame.new(5, 2, -5)
+            local lookAtPosition = head.Position
+            local targetCFrame = CFrame.new(guiPosition.Position, lookAtPosition)
+            part.CFrame = part.CFrame:Lerp(targetCFrame, 0.1) -- Slower follow speed for smooth movement
+        end
+    end)
+end
+
+-- Initialize GUI for the current character
+initializeGUI()
+
+-- Handle respawning
+player.CharacterAdded:Connect(function(newCharacter)
+    head = newCharacter:WaitForChild("Head")
+    initializeGUI()
+end)
+
+
+
+
+-- Ensure this script is a LocalScript
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local head = character:WaitForChild("Head")
+
+-- Create a part for the floating GUI
+local part = Instance.new("Part")
+part.Size = Vector3.new(10, 5, 0.1)
+part.Anchored = true
+part.CanCollide = false
+part.Transparency = 1
+part.Parent = workspace
+
+-- Create the SurfaceGui for the front
+local frontSurfaceGui = Instance.new("SurfaceGui")
+frontSurfaceGui.Adornee = part
+frontSurfaceGui.Face = Enum.NormalId.Front -- Display on the front
+frontSurfaceGui.CanvasSize = Vector2.new(600, 300)
+frontSurfaceGui.Parent = part
+
+-- Create a Frame for the front with an outline effect
+local frontFrame = Instance.new("Frame")
+frontFrame.Size = UDim2.new(1, 0, 1, 0)
+frontFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+frontFrame.BorderSizePixel = 4 -- Increase the border to create an outline effect
+frontFrame.BorderColor3 = Color3.fromRGB(0, 255, 0) -- Outline color (green)
+frontFrame.Parent = frontSurfaceGui
+
+-- Create a TextLabel for the front
+local frontGlitchLabel = Instance.new("TextLabel")
+frontGlitchLabel.Size = UDim2.new(1, 0, 0.8, 0) -- Leave space for the close button
+frontGlitchLabel.BackgroundTransparency = 1
+frontGlitchLabel.TextColor3 = Color3.new(1, 0, 0) -- Red color
+frontGlitchLabel.Font = Enum.Font.GothamBold -- Fancy font
+frontGlitchLabel.Text = "BY SUSSY\n(Update logs behind gui)"
+frontGlitchLabel.TextScaled = true
+frontGlitchLabel.Parent = frontFrame
+
+-- Create a SurfaceGui for the back
+local backSurfaceGui = Instance.new("SurfaceGui")
+backSurfaceGui.Adornee = part
+backSurfaceGui.Face = Enum.NormalId.Back -- Display on the back
+backSurfaceGui.CanvasSize = Vector2.new(600, 300)
+backSurfaceGui.Parent = part
+
+-- Create a Frame for the back with an outline effect
+local backFrame = Instance.new("Frame")
+backFrame.Size = UDim2.new(1, 0, 1, 0)
+backFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+backFrame.BorderSizePixel = 4 -- Increase the border to create an outline effect
+backFrame.BorderColor3 = Color3.fromRGB(0, 255, 0) -- Outline color (green)
+backFrame.Parent = backSurfaceGui
+
+-- Create a TextLabel for the back
+local backGlitchLabel = Instance.new("TextLabel")
+backGlitchLabel.Size = UDim2.new(1, 0, 0.8, 0) -- Leave space for the close button
+backGlitchLabel.BackgroundTransparency = 1
+backGlitchLabel.TextColor3 = Color3.new(1, 0, 0) -- Red color
+backGlitchLabel.Font = Enum.Font.GothamBold -- Fancy font
+backGlitchLabel.Text = "Update logs:\n• Add Gui stay when you die\n• Add favorite player when they left\n• Add position character\n—i've been working hard for this please enjoy it 🥺\n—i tried alot of failed untill it finally work\n*Thank you for using SUSSSYYs script❤*"
+backGlitchLabel.TextScaled = true
+backGlitchLabel.Parent = backFrame
+
+-- Glitch effect function
+local function applyGlitchEffect(label)
+    while true do
+        label.TextStrokeTransparency = math.random() -- Random glitch effect on text
+        label.Position = UDim2.new(0, math.random(-5, 5), 0, math.random(-5, 5)) -- Small random shifts
+        label.Parent.BackgroundTransparency = math.random(1, 3) * 0.1 -- Random background flicker
+        wait(0.1)
     end
 end
 
--- Function to stop the animation
-local function stopAnimation()
-    if currentAnimTrack then
-        currentAnimTrack:Stop()
-        currentAnimTrack = nil
+-- Call glitch effect for both front and back labels
+spawn(function() applyGlitchEffect(frontGlitchLabel) end)
+spawn(function() applyGlitchEffect(backGlitchLabel) end)
 
-        -- Revert the button back to "Run"
-        runButton.Text = "Run"
-        runButton.BackgroundColor3 = Color3.fromRGB(50, 50, 255)
-    end
+-- Function to create "101010" floating effect
+local function createFloatingText()
+    local text = Instance.new("TextLabel")
+    text.Size = UDim2.new(0, 50, 0, 50)
+    text.Text = math.random(0, 1) -- Randomly choose between 0 and 1
+    text.Font = Enum.Font.GothamBold
+    text.TextColor3 = Color3.fromRGB(255, 255, 255)
+    text.BackgroundTransparency = 1
+    text.TextScaled = true
+    text.Parent = frontFrame
+
+    -- Randomly place around GUI
+    text.Position = UDim2.new(math.random(), 0, math.random(), 0)
+
+    -- Fade and remove after a short time
+    local tween = game:GetService("TweenService"):Create(text, TweenInfo.new(2, Enum.EasingStyle.Linear), {TextTransparency = 1, Position = UDim2.new(math.random(), 0, math.random(), -0.5)})
+    tween:Play()
+    tween.Completed:Connect(function()
+        text:Destroy()
+    end)
 end
 
--- Add functionality to toggle between running and stopping the animation
-runButton.MouseButton1Click:Connect(function()
-    if runButton.Text == "Run" then
-        runAnimation()
-    else
-        stopAnimation()
+-- Loop to create floating "101010" text
+spawn(function()
+    while true do
+        createFloatingText()
+        wait(0.5)
     end
 end)
 
--- Update GUI positions to follow the player smoothly
+-- Move GUI and make it face the player smoothly
 game:GetService("RunService").RenderStepped:Connect(function()
-    local targetPosition = head.CFrame * CFrame.new(0, 12, -5)
-    local lookAtPosition = head.Position
-    part.CFrame = part.CFrame:Lerp(CFrame.new(targetPosition.Position, lookAtPosition), 0.05)
-
-    -- Position the input GUI to the right of the main GUI
-    local inputTargetPosition = head.CFrame * CFrame.new(10, 10, -5) -- Shifted to the right
-    inputPart.CFrame = inputPart.CFrame:Lerp(CFrame.new(inputTargetPosition.Position, lookAtPosition), 0.05)
+    -- Position the GUI in front of the player and make it face the player
+    local guiPosition = head.CFrame * CFrame.new(-3, 2, -5) -- Position slightly in front and to the left
+    local lookAtPosition = head.Position -- Character's head to look at
+    
+    -- Set the GUI's CFrame to face the player smoothly with CFrame.lookAt
+    part.CFrame = CFrame.new(guiPosition.Position, lookAtPosition):Lerp(part.CFrame, 0.95) -- Smooth transition to the new position
 end)
 
--- Add a "Back" face to the GUI to make it visible from the back as well
-local function createBackFace(part, color)
-    local backSurfaceGui = Instance.new("SurfaceGui")
-    backSurfaceGui.Adornee = part
-    backSurfaceGui.Face = Enum.NormalId.Back
-    backSurfaceGui.CanvasSize = Vector2.new(600, 300)
-    backSurfaceGui.Parent = part
+-- Create a Close Button on the front
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0.2, 0, 0.2, 0) -- Small button on the top right
+closeButton.Position = UDim2.new(0.8, 0, 0, 0) -- Top-right corner
+closeButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+closeButton.TextColor3 = Color3.new(1, 1, 1)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Text = "X"
+closeButton.Parent = frontFrame
 
-    local backFrame = Instance.new("Frame")
-    backFrame.Size = UDim2.new(1, 0, 1, 0)
-    backFrame.BackgroundTransparency = 0.7
-    backFrame.BackgroundColor3 = color
-    backFrame.BorderSizePixel = 2
-    backFrame.Parent = backSurfaceGui
-
-    local backCorner = Instance.new("UICorner")
-    backCorner.CornerRadius = UDim.new(0, 20)
-    backCorner.Parent = backFrame
+-- Close GUI function
+local function closeGui()
+    part:Destroy()
 end
 
--- Create the back faces for both GUI parts
-createBackFace(part, Color3.fromRGB(0, 0, 0), 0.5)  -- Black for the main GUI
-createBackFace(inputPart, Color3.fromRGB(0, 0, 0), 0.5)  -- Black for the input GUI
-
+-- Connect close button clicks to close function
+closeButton.MouseButton1Click:Connect(closeGui)
