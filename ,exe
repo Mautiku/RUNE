@@ -1,17 +1,16 @@
--- ตัวแปรหลัก
-local player          = game.Players.LocalPlayer
-local StarterGui      = game:GetService("StarterGui")
-local RunService      = game:GetService("RunService")
-local ContentProvider = game:GetService("ContentProvider")
-local TextChatService = game:GetService("TextChatService")
-local PlayersService  = game:GetService("Players")
-
--- สถานะ
-local isStopped, confirmed, alreadyApplied, firstRun = false, false, false, true
-
--- ลิสต์แพ็ก
-local packs = {
-    -- เพิ่มแพ็กที่มีทั้งหมด
+-- ตัวแปรหลัก    
+local player          = game.Players.LocalPlayer    
+local StarterGui      = game:GetService("StarterGui")    
+local RunService      = game:GetService("RunService")    
+local ContentProvider = game:GetService("ContentProvider")    
+local TextChatService = game:GetService("TextChatService")    
+local PlayersService  = game:GetService("Players")    
+    
+-- สถานะ    
+local isStopped, confirmed, alreadyApplied, firstRun = false, false, false, true    
+    
+-- ลิสต์แพ็ก    
+local packs = {    
     Ninja = {
         idle1 = "rbxassetid://656117400",
         idle2 = "rbxassetid://656118341",
@@ -238,156 +237,145 @@ local packs = {
         climb = "rbxassetid://10921229866"
     }
 }
-
--- เลือกแพ็ก
-local rawName = tostring(getgenv().pack or "Default")
-local selectedPackName
-for name in pairs(packs) do
-    if name:lower() == rawName:lower() then selectedPackName = name; break end
-end
-if not selectedPackName then warn("Invalid pack: "..rawName); return end
-local Anims = packs[selectedPackName]
-
--- preload
-do
-    local urls = {}
-    for _, id in pairs(Anims) do table.insert(urls, id) end
-    ContentProvider:PreloadAsync(urls)
-end
-
--- ฟังก์ชันตั้ง AnimationId
-local function applyAnimPack(char)
-    local a = char:FindFirstChild("Animate")
-    if not a then return end
-    local function s(o,id) if o then o.AnimationId = id end end
-    s(a.idle.Animation1, Anims.idle1)
-    s(a.idle.Animation2, Anims.idle2)
-    s(a.walk.WalkAnim,   Anims.walk)
-    s(a.run.RunAnim,     Anims.run)
-    s(a.jump.JumpAnim,   Anims.jump)
-    s(a.fall.FallAnim,   Anims.fall)
-    s(a.climb.ClimbAnim, Anims.climb)
-end
-
--- รอ Animate/Humanoid
-local function waitForRequired(char)
-    local st = tick(); local hum, a
-    while tick()-st < 3 do
-        hum = hum or char:FindFirstChild("Humanoid")
-        a   = a   or char:FindFirstChild("Animate")
-        if hum and a then return hum,a end
-        task.wait()
-    end
-    return hum,a
-end
-
--- ประมวลผลตัวละคร
-local function handleCharacter(char)
-    if isStopped or not confirmed or alreadyApplied then return end
-    local hum = char:FindFirstChild("Humanoid") or char:WaitForChild("Humanoid",1)
-    local a   = char:FindFirstChild("Animate")  or char:WaitForChild("Animate",1)
-    if not (hum and a) then hum,a = waitForRequired(char) end
-    if hum and a then
-        applyAnimPack(char)
-        alreadyApplied = true
-        if firstRun then firstRun = false; hum.Health = 0 end
-    end
-end
-
--- เช็คตอนวิ่ง
-local function checkRunAnimation(char)
-    local h = char:FindFirstChild("Humanoid")
-    if h and h.MoveDirection.Magnitude > 0 then
-        applyAnimPack(char)
-    end
-end
-
--- สร้าง/ล้าง connection
-local heartbeatConn, appearanceConn, descendantConn
-
--- ตัวช่วยถาม
-local function askToRun()
-    local b = Instance.new("BindableFunction")
-    b.OnInvoke = function(resp)
-        if resp == "Yes" then
-            confirmed = true
-            if player.Character then handleCharacter(player.Character) end
-        else
-            isStopped = true
-        end
-    end
-    StarterGui:SetCore("SendNotification", {
-        Title = "Mautiku says", 
-        Text = "Use animation pack: "..selectedPackName.." ?", 
-        Duration = 10, 
-        Callback = b, 
-        Button1 = "Yes", 
-        Button2 = "No"
-    })
-end
-
-local function stopScriptCompletely()
-    if isStopped then return end
-    isStopped = true
-    StarterGui:SetCore("SendNotification", {
-        Title = "SussyXDD says", 
-        Text = "Animation pack stopped", 
-        Duration = 3
-    })
-end
-
-local function startWatchdog()
-    RunService.Heartbeat:Connect(function()
-        if confirmed and not isStopped and player.Character and not alreadyApplied then
-            handleCharacter(player.Character)
-        end
-    end)
-end
-
--- เชื่อม event
-player.CharacterAdded:Connect(function(char)
-    alreadyApplied = false
-    -- ล้างของเก่า
-    if heartbeatConn  then heartbeatConn:Disconnect()  end
-    if descendantConn then descendantConn:Disconnect() end
     
-    if confirmed and not isStopped then
-        handleCharacter(char)
-        heartbeatConn = RunService.Heartbeat:Connect(function() checkRunAnimation(char) end)
-        descendantConn = char.DescendantAdded:Connect(function(d)
-            if not alreadyApplied and (d.Name == "Animate" or d.Name == "Humanoid") then
-                handleCharacter(char)
-            end
-        end)
-    end
-end)
-
--- CharacterAppearanceLoaded
-if player.CharacterAppearanceLoaded then
-    appearanceConn = player.CharacterAppearanceLoaded:Connect(function(char)
-        alreadyApplied = false
-        if confirmed and not isStopped then handleCharacter(char) end
-    end)
-end
-
--- คำสั่ง /e stop
-player.Chatted:Connect(function(m)
-    if m:lower() == "/e stop" then stopScriptCompletely() end
-end)
-
--- log แชท
-PlayersService.PlayerAdded:Connect(function(p)
-    p.Chatted:Connect(function(m) print("จาก Chatted: "..m) end)
-end)
-
-TextChatService.OnIncomingMessage = function(msg)
-    if msg.TextSource then
-        local p = PlayersService:GetPlayerByUserId(msg.TextSource.UserId)
-        if p then print("จาก OnIncomingMessage: "..msg.Text) end
-    end
-end
-
--- เริ่มต้น
-if player.Character then handleCharacter(player.Character) end
-startWatchdog()
+-- เลือกแพ็ก    
+local rawName = tostring(getgenv().pack or "Default")    
+local selectedPackName    
+for name in pairs(packs) do    
+    if name:lower() == rawName:lower() then selectedPackName = name; break    
+    end    
+end    
+if not selectedPackName then warn("Invalid pack: "..rawName); return end    
+local Anims = packs[selectedPackName]    
+    
+-- preload    
+do    
+    local urls = {}    
+    for _, id in pairs(Anims) do table.insert(urls, id) end    
+    ContentProvider:PreloadAsync(urls)    
+end    
+    
+-- ฟังก์ชันตั้ง AnimationId    
+local function applyAnimPack(char)    
+    local a = char:FindFirstChild("Animate")    
+    if not a then return end    
+    local function s(o,id) if o then o.AnimationId = id end end    
+    s(a.idle.Animation1, Anims.idle1)    
+    s(a.idle.Animation2, Anims.idle2)    
+    s(a.walk.WalkAnim,      Anims.walk)    
+    s(a.run.RunAnim,        Anims.run)    
+    s(a.jump.JumpAnim,      Anims.jump)    
+    s(a.fall.FallAnim,      Anims.fall)    
+    s(a.climb.ClimbAnim,    Anims.climb)    
+end    
+    
+-- รอ Animate/Humanoid    
+local function waitForRequired(char)    
+    local st = tick(); local hum, a    
+    while tick()-st < 3 do    
+        hum = hum or char:FindFirstChild("Humanoid")    
+        a   = a   or char:FindFirstChild("Animate")    
+        if hum and a then return hum,a end    
+        task.wait()    
+    end    
+    return hum,a    
+end    
+    
+-- ประมวลผลตัวละคร    
+local function handleCharacter(char)    
+    if isStopped or not confirmed or alreadyApplied then return end    
+    local hum = char:FindFirstChild("Humanoid") or char:WaitForChild("Humanoid",1)    
+    local a   = char:FindFirstChild("Animate")  or char:WaitForChild("Animate",1)    
+    if not (hum and a) then hum,a = waitForRequired(char) end    
+    if hum and a then    
+        applyAnimPack(char)    
+        alreadyApplied = true    
+        if firstRun then firstRun = false; hum.Health = 0 end    
+    end    
+end    
+    
+-- เช็คตอนวิ่ง    
+local function checkRunAnimation(char)    
+    local h = char:FindFirstChild("Humanoid")    
+    if h and h.MoveDirection.Magnitude>0 then applyAnimPack(char) end    
+end    
+    
+-- สร้าง/ล้าง connection    
+local heartbeatConn, appearanceConn, descendantConn    
+    
+-- ตัวช่วยถาม    
+local function askToRun()    
+    local b = Instance.new("BindableFunction")    
+    b.OnInvoke = function(resp)    
+        if resp=="Yes" then confirmed=true    
+            if player.Character then handleCharacter(player.Character) end    
+        else isStopped=true end    
+    end    
+    StarterGui:SetCore("SendNotification", {    
+        Title="Mautiku says", Text="Use animation pack: "..selectedPackName.." ?", Duration=10,    
+        Callback=b, Button1="Yes", Button2="No"    
+    })    
+end    
+    
+local function stopScriptCompletely()    
+    if isStopped then return end    
+    isStopped = true    
+    StarterGui:SetCore("SendNotification", {    
+        Title="SussyXDD says", Text="animation pack stopped", Duration=3    
+    })    
+end    
+    
+local function startWatchdog()    
+    RunService.Heartbeat:Connect(function()    
+        if confirmed and not isStopped and player.Character and not alreadyApplied then    
+            handleCharacter(player.Character)    
+        end    
+    end)    
+end    
+    
+-- เชื่อม event    
+player.CharacterAdded:Connect(function(char)    
+    alreadyApplied = false    
+    -- ล้างของเก่า    
+    if heartbeatConn  then heartbeatConn:Disconnect()  end    
+    if descendantConn then descendantConn:Disconnect() end    
+    
+    if confirmed and not isStopped then    
+        handleCharacter(char)    
+        heartbeatConn = RunService.Heartbeat:Connect(function() checkRunAnimation(char) end)    
+        descendantConn = char.DescendantAdded:Connect(function(d)    
+            if not alreadyApplied and (d.Name=="Animate" or d.Name=="Humanoid") then    
+                handleCharacter(char)    
+            end    
+        end)    
+    end    
+end)    
+    
+-- CharacterAppearanceLoaded    
+if player.CharacterAppearanceLoaded then    
+    appearanceConn = player.CharacterAppearanceLoaded:Connect(function(char)    
+        alreadyApplied = false    
+        if confirmed and not isStopped then handleCharacter(char) end    
+    end)    
+end    
+    
+-- คำสั่ง /e stop    
+player.Chatted:Connect(function(m)    
+    if m:lower()=="/e stop" then stopScriptCompletely() end    
+end)    
+    
+-- log แชท    
+PlayersService.PlayerAdded:Connect(function(p)    
+    p.Chatted:Connect(function(m) print("จาก Chatted: "..m) end)    
+end)    
+TextChatService.OnIncomingMessage = function(msg)    
+    if msg.TextSource then    
+        local p=PlayersService:GetPlayerByUserId(msg.TextSource.UserId)    
+        if p then print("จาก OnIncomingMessage: "..msg.Text) end    
+    end    
+end    
+    
+-- เริ่มต้น    
+if player.Character then handleCharacter(player.Character) end    
+startWatchdog()    
 askToRun()
